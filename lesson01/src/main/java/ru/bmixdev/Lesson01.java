@@ -1,7 +1,7 @@
 package ru.bmixdev;
 //GIT отпочковал ветку lesson01
 
-public class HelloWorld {
+public class Lesson01 {
 
     private static int getValueABCD(int a, int b, int c, int d) {
         return a * (b + (c / d));
