@@ -14,6 +14,13 @@ public class Utils {
             ints[i] = getRandomInt(-100, 100);
         return ints;
     }
+    public static String getUserConsoleInput(String msg) {
+        if (msg != null || !msg.isEmpty())
+            System.out.print(msg);
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.next();
+        return input;
+    }
 
     public static void printArray(int[] ints) {
         System.out.print("\t[");
