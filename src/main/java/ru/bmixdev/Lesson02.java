@@ -32,8 +32,12 @@ public class Lesson02 {
     private static void example24() {
         int[][] ints = new int [5][5];
         for (int i = 0; i < ints.length; i++)
-            for (int j = 0; j < ints[i].length; j ++)
-                ints[i][j] = i == j ? 1 : 0;
+            for (int j = 0; j < ints[i].length; j ++) {
+                if (i == j) {
+                    ints[i][j] = 1;
+                    ints[ints.length-i-1][j] = 1;
+                }
+            }
         printArray(ints);
     }
 
