@@ -6,9 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static ru.bmixdev.ConsoleColors.*;
+import static ru.bmixdev.Utils.ANSI_RESET;
+
 public class Lesson04 {
 
     private static int[][] arrProgress;
+    private static int[][] winArray;
     private static int sizeArea = 3;
     private static Scanner scanner;
     private static StringBuilder sb;
@@ -27,11 +31,12 @@ public class Lesson04 {
         sizeArea = scanner.nextInt();
         arrProgress = new int[sizeArea][sizeArea];
         scoreToWin = sizeArea < 5 ? sizeArea : 4;
-        printArea();
+        winArray = new int[scoreToWin][2];
+        printArea(false);
     }
 
     public static void printSeparator() {
-        sb.append("+");
+        sb.append("-----+");
         for (int i = 0; i < sizeArea; i++)
             sb.append("---+");
         sb.append("\n");
@@ -48,13 +53,29 @@ public class Lesson04 {
         }
     }
 
-    public static void printArea() {
+    public static void printArea(boolean isWin) {
         sb.setLength(0);
+        // Шапка
+        sb.append(" y/x |");
+        for (int row = 0; row < arrProgress.length; row++)
+            sb.append(" ").append(PURPLE).append((row + 1)).append(RESET).append(" |");
+        sb.append("\n");
+
         for (int row = 0; row < arrProgress.length; row++) {
             printSeparator();
-            sb.append("|");
+            sb.append("  " + PURPLE + (row+1) + RESET + "  |");
             for (int col = 0; col < arrProgress[row].length; col++) {
-                sb.append(String.format(" %s |", printSymbol(arrProgress[row][col])));
+                if (isWin) {
+                    boolean printed = false;
+                    for (int i = 0; i < winArray.length; i++) {
+                        if (winArray[i][0] != -1 && winArray[i][1] != -1 && winArray[i][0] == row && winArray[i][1] == col) {
+                            sb.append(" ").append(GREEN_BOLD).append(printSymbol(arrProgress[row][col])).append(RESET).append(" |");
+                            printed = true;
+                        }
+                    }
+                    if (!printed) sb.append(String.format(" %s |", printSymbol(arrProgress[row][col])));
+                }
+                else sb.append(String.format(" %s |", printSymbol(arrProgress[row][col])));
             }
             sb.append("\n");
         }
@@ -62,28 +83,42 @@ public class Lesson04 {
         System.out.println(sb);
     }
 
-    private static boolean checkDirection(char axis, int x, int y) {
+    private static void clearWinArray() {
+        for (int i = 0; i < winArray.length; i++)
+            for (int j = 0; j < winArray[i].length; j++) {
+                winArray[i][j] = -1;
+
+            }
+    }
+
+    private static void addToWin(int idx, int x, int y) {
+        winArray[idx][0] = x;
+        winArray[idx][1] = y;
+    }
+
+    private static boolean checkDirection(int player, char axis, int x, int y) {
         d(String.format("checkDirection(%c,%d,%d)\n",axis,x,y));
         boolean res = false;
         boolean storeScore = true;
         int curX = x; int curY = y; int score = 0; int direct = 1;
         int scoreTotal = 0;
         int curValue;
-            switch (axis) {
+        clearWinArray();
+        switch (axis) {
                 case ('X'): {
                     curY = 0;
                     while (true) {
                         if ((curY < 0) || (curY == arrProgress[curX].length)) break;
                         curValue = arrProgress[curX][curY];
-                        if (curValue == 0) {
-                        //    storeScore = false;
+                        if (curValue != player ) {
                             score = 0;
+                            clearWinArray();
                         }
-                       //if (storeScore)
+                        addToWin(Math.abs(score), curX, curY);
                         score += curValue;
                         scoreTotal += curValue;
                         curY += direct;
-                        if (score == scoreToWin) return true;
+                        if (Math.abs(score) == scoreToWin) return true;
                     }
                     break;
                 }
@@ -92,90 +127,116 @@ public class Lesson04 {
                     while (true) {
                         if ((curX < 0) || (curX == arrProgress.length)) break;
                         curValue = arrProgress[curX][curY];
-                        if (curValue == 0) {
-                           // storeScore = false;
+                        if (curValue != player ) {
                             score = 0;
+                            clearWinArray();
                         }
-                        //if (storeScore)
+                        addToWin(Math.abs(score), curX, curY);
                         score += curValue;
                         scoreTotal += curValue;
                         curX += direct;
-                        if (score == scoreToWin) return true;
+                        if (Math.abs(score) == scoreToWin) return true;
                     }
                     break;
                 }
                 case ('D'): {
                     // проверка диагонали слева направо
-                    curX = x; curY = y;
+                    curX = x; curY = y; score = 0; scoreTotal = 0;
                     while (curX > 0  && curY > 0) {
                         curX--; curY--;
                     }
                     while ((curX != arrProgress.length) && (curY != arrProgress[curX].length)) {
                         curValue = arrProgress[curX][curY];
-                        if (curValue == 0) score = 0;
+                        if (curValue != player ) {
+                            score = 0;
+                            clearWinArray();
+                        }
+                        addToWin(Math.abs(score), curX, curY);
                         score += curValue;
                         scoreTotal += curValue;
-                        if (score == scoreToWin) return true;
+                        if (Math.abs(score) == scoreToWin) return true;
                         curX++; curY++;
                     }
                     // проверка диагонали справа налево
-                    curX = x; curY = y;
+                    curX = x; curY = y; score = 0; scoreTotal = 0;
                     while (curX > 0 && curY < arrProgress[curX].length - 1) {
                         curX--; curY++ ;
                     }
                     while ((curX != arrProgress.length) && (curY != 0)) {
                         curValue = arrProgress[curX][curY];
-                        if (curValue == 0) score = 0;
+                        if (curValue != player ) {
+                            score = 0;
+                            clearWinArray();
+                        }
+                        addToWin(Math.abs(score), curX, curY);
                         score += curValue;
                         scoreTotal += curValue;
-                        if (score == scoreToWin) return true;
+                        if (Math.abs(score) == scoreToWin) return true;
                         curX++; curY--;
                     }
                     break;
                 }
-            }
+        }
         d(String.format("score: %d scoreTotal: %d\n", score,  scoreTotal));
         return false;
     }
 
     private static boolean checkWin(int player, int x, int y) {
-        boolean winToX = checkDirection('X', x, y);
-        boolean winToY = checkDirection('Y', x, y);
-        boolean winToD = checkDirection('D', x, y);
+        boolean winToX = false;  boolean winToY = false; boolean winToD = false;
+        winToX = checkDirection(player, 'X', x, y);
+        if (!winToX) {
+            winToY = checkDirection(player, 'Y', x, y);
+            if (!winToY)
+                winToD = checkDirection(player,'D', x, y);
+        }
 
         if (winToX || winToY || winToD) {
-            System.out.printf("Игра окончена. Победил: %s\n", player == 1 ? "Игрок" : "Компьютер" );
+            System.out.printf("Игра окончена. Победил: %s\n" + RESET, player == 1 ? GREEN_UNDERLINED + "Игрок" : RED_UNDERLINED + "Компьютер" );
+            printArea(true);
             return true;
         }
         return false;
     }
 
     private static int[] moveComputer() {
-        int row = Utils.getRandomInt(0, arrProgress.length - 1);
-        ArrayList cols = new ArrayList();
-        for (int col = 0; col < arrProgress[row].length ; col++) {
-              if (arrProgress[row][col] == 0) cols.add(col);
-        }
-        int col = (int) cols.get(Utils.getRandomInt(1, cols.size()));
+        int row;
+        int col;
+        do {
+           row = Utils.getRandomInt(0, arrProgress.length - 1);
+           col = Utils.getRandomInt(0, arrProgress.length - 1);
+        } while ( arrProgress[row][col]  != 0 );
         arrProgress[row][col] = -1;
         return new int[] {row, col};
     }
 
     private static int[] movePlayer() {
         int row;
-        while (true) {
-            System.out.print("Введите номер строки: ");
-            row = scanner.nextInt()-1;
-            if (row < arrProgress.length) break;
-        }
         int col;
-        while (true) {
-            System.out.print("Введите номер столбца: ");
-            col = scanner.nextInt() - 1;
-            if (col < arrProgress[row].length) break;
-        }
+        do {
+            while (true) {
+                System.out.print("Введите номер строки: ");
+                row = scanner.nextInt()-1;
+                if (row < arrProgress.length) break;
+            }
+
+            while (true) {
+                System.out.print("Введите номер столбца: ");
+                col = scanner.nextInt() - 1;
+                if (col < arrProgress[row].length) break;
+            }
+        } while ( arrProgress[row][col]  != 0 );
         arrProgress[row][col] = 1;
         return new int[] {row, col};
+    }
+
+    //проверка на ничью
+    public static boolean checkToDraw() {
+        for (int i = 0; i < arrProgress.length; i++) {
+            for (int j = 0; j < arrProgress[i].length; j++) {
+                if (arrProgress[i][j] == 0) return false;
+            }
+        }
+        return true;
     }
 
     private static void loopGame() {
@@ -183,27 +244,23 @@ public class Lesson04 {
         while (true) {
             // ход игрока
             int[] movePointPlayer = movePlayer();
-            printArea();
+
+            printArea(false);
             if (checkWin(1, movePointPlayer[0], movePointPlayer[1])) break;
+
             // ход компьютера
             int[] movePointComputer = moveComputer();
-            printArea();
+            printArea(false);
             if (checkWin(-1, movePointComputer[0], movePointComputer[1])) break;
+
+            if (checkToDraw()) {
+                System.out.println("Игра окончена - "+PURPLE_BOLD_BRIGHT+"Ничья"+RESET);
+                break;
+            }
         }
     }
 
     public static void main(String[] args) {
-        /*
-        int[][] ints = new int[5][5];
-        for (int i = 0; i < ints.length; i++)
-            for (int j = 0; j < ints[i].length; j ++) {
-                if (i == j) {
-                    ints[i][j] = 1;
-                    ints[ints.length-i-1][j] = 1;
-                }
-            }
-        Utils.printArray(ints);
-            */
         while (true) {
             loopGame();
             System.out.print("Повторить (0-нет/1-да)? ");
