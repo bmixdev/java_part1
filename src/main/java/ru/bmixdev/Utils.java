@@ -18,6 +18,10 @@ public class Utils {
         return (int)(Math.random()*((max-min)+1))+min;
     }
 
+    public static double getRandom(int min, int max) {
+        return (Math.random()*((max-min)+1))+min;
+    }
+
     public static int[] generateArray(int size) {
         int[] ints = new int[size];
         for (int i = 0; i < ints.length; i++)
