@@ -13,21 +13,27 @@ public class Lesson05 {
             sb.append("\nСписок всех сотрудников:\n\n");
         else
             sb.append(String.format("\nСписок сотрудников старше %s лет:\n\n", largeAge));
-        sb.append(String.format("+-%20c-+-%20c-+-%20c-+-%10c-+-%20c-+-%10c-+-%20c-+", ' ',' ',' ',' ',' ',' ', ' ', ' ').replace(' ','-')).append('\n');
 
-        sb.append(String.format("| %20s | %20s | %20s | %10s | %20s | %10s | %20s |", "Фамилия", "Имя", "Отчество", "Должность", "EMAIL", "Возраст", "Зарплата")).append('\n');
-        sb.append(String.format("+-%20c-+-%20c-+-%20c-+-%10c-+-%20c-+-%10c-+-%20c-+", ' ',' ',' ',' ',' ',' ', ' ', ' ').replace(' ','-')).append('\n');
+        sb.append(ConsoleColors.BLACK +""+ConsoleColors.WHITE_BACKGROUND).append(String.format("+-%20c-+-%20c-+-%20c-+-%10c-+-%20c-+-%10c-+-%20c-+", ' ',' ',' ',' ',' ',' ', ' ', ' ').replace(' ','-')).append(ConsoleColors.RESET).append('\n');
+
+        sb.append(ConsoleColors.BLACK +""+ConsoleColors.WHITE_BACKGROUND).append(String.format("| %20s | %20s | %20s | %10s | %20s | %10s | %20s |", "Фамилия", "Имя", "Отчество", "Должность", "EMAIL", "Возраст", "Зарплата")).append(ConsoleColors.RESET).append('\n');
+        sb.append(ConsoleColors.BLACK +""+ConsoleColors.WHITE_BACKGROUND).append(String.format("+-%20c-+-%20c-+-%20c-+-%10c-+-%20c-+-%10c-+-%20c-+", ' ',' ',' ',' ',' ',' ', ' ', ' ').replace(' ','-')).append(ConsoleColors.RESET).append('\n');
 
         int cntRec = 0;
         for (Employee e: employees) {
             if (e.getAge() > largeAge) {
-                sb.append(String.format("| %20s | %20s | %20s | %10s | %20s | %10s | %20.2f |", e.getFirstName(), e.getMiddleName(), e.getLastName(), e.getPosition(), e.getEmail(), e.getAge(), e.getSalary())).append('\n');
+                if (cntRec % 2 == 1)
+                    sb.append(ConsoleColors.BLACK +""+ConsoleColors.WHITE_BACKGROUND);
+                sb.append(String.format("| %20s | %20s | %20s | %10s | %20s | %10s | %20.2f |", e.getFirstName(), e.getMiddleName(), e.getLastName(), e.getPosition(), e.getEmail(), e.getAge(), e.getSalary()));
+                if (cntRec % 2 == 1)
+                    sb.append(ConsoleColors.RESET);
+                sb.append('\n');
                 cntRec++;
             }
         }
 
         sb.append(String.format("+-%20c-+-%20c-+-%20c-+-%10c-+-%20c-+-%10c-+-%20c-+", ' ',' ',' ',' ',' ',' ', ' ', ' ').replace(' ','-')).append('\n');
-        sb.append(String.format("Кол-во записей: %s", cntRec));
+        sb.append(ConsoleColors.GREEN_BOLD).append(String.format("Кол-во записей: %s", cntRec)).append(ConsoleColors.RESET).append('\n');
 
         System.out.print(sb);
     }
@@ -56,5 +62,6 @@ public class Lesson05 {
         printTableEmployees(employees,0);
         // список сотрудников старше 40 лет
         printTableEmployees(employees,40);
+
     }
 }
