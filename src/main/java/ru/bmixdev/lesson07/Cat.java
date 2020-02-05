@@ -3,27 +3,43 @@ package ru.bmixdev.lesson07;
 public class Cat {
     private String name;
     private int appetite;
-    private int full;
+    private final int sizeFull = 100;
+    private int prcFulled;
 
-    public Cat(String name, int appetite, int full) {
+    public Cat(String name, int appetite) {
         this.name = name;
         this.appetite = appetite;
-        this.full = full;
+        this.prcFulled = 0;
+    }
+
+    @Override
+    public String toString() {
+        return "Cat{" +
+                "name='" + name + '\'' +
+                ", appetite=" + appetite +
+                ", sizeFull=" + sizeFull +
+                ", prcFulled=" + prcFulled +
+                '}';
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public void eat(Plate p) {
-        p.decreaseFood(appetite);
-        if ( (full -appetite) < 0) {
-            full = 0;
-            System.out.println(this.name + " полностью сытый. Больше кушать не хочет!");
-        }
-        else {
-            full -= appetite;
-            System.out.println(this.name + " сытый на " + full + "%");
+        if (p.decreaseFood(appetite)) {
+            // если еды достаточно
+            if (sizeFull <= (prcFulled + appetite)) {
+                prcFulled = sizeFull;
+                System.out.println(this.name + " полностью сытый. Больше кушать не хочет!");
+            } else {
+                prcFulled += appetite;
+                System.out.println(this.name + " сытый на " + prcFulled + "%");
+            }
         }
     }
 
     public boolean isFulled() {
-        return full <= 0;
+        return prcFulled >= sizeFull;
     }
 }

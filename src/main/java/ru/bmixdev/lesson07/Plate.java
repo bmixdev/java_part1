@@ -16,6 +16,11 @@ public class Plate {
         }
     }
     public void info() {
-        System.out.println("plate: " + food);
+        System.out.println("Кол-во еды в тарелке: " + food);
+    }
+
+    public void addFood(int value) {
+        food += value;
+        System.out.printf("В тарелку добавлено %s ед. еды\n", value);
     }
 }
